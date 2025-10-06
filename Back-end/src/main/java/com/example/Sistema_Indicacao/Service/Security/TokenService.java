@@ -1,4 +1,4 @@
-package com.example.Sistema_Indicacao.Service;
+package com.example.Sistema_Indicacao.Service.Security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 @Service
-    public class TokenService {
+public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
@@ -31,8 +31,23 @@ import java.time.ZoneOffset;
         }
     }
 
+    public String ValidarToken(String token){
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            return JWT.require(algorithm)
+                    .withIssuer("auth-login")
+                    .build()
+                    .verify(token)
+                    .getSubject();
+
+        } catch (JWTCreationException exception){
+            return null;
+        }
+
+    }
+
     private Instant dataExpiracao() {
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-3"));
+        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
     }
 
 }
