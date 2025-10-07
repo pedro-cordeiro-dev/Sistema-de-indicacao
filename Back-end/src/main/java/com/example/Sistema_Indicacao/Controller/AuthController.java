@@ -4,6 +4,7 @@ import com.example.Sistema_Indicacao.DTO.LoginRequestDTO;
 import com.example.Sistema_Indicacao.DTO.RegistrarRequestDTO;
 import com.example.Sistema_Indicacao.DTO.ResponseDTO;
 import com.example.Sistema_Indicacao.Repository.UsuarioRepository;
+import com.example.Sistema_Indicacao.Service.Security.GeradorLinkIndicacaoService;
 import com.example.Sistema_Indicacao.Service.Security.TokenService;
 import com.example.Sistema_Indicacao.model.Usuario;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +25,14 @@ public class AuthController {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final GeradorLinkIndicacaoService geradorLink;
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequestDTO body) {
         Usuario usuario = this.usuarioRepository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("User Not Found"));
         if (passwordEncoder.matches(body.password(), usuario.getSenha())) {
             String token = this.tokenService.GerarToken(usuario);
-            return ResponseEntity.ok(new ResponseDTO(usuario.getNome(), token));
+            return ResponseEntity.ok(new ResponseDTO(usuario.getNome(), token, usuario.getLinkIndicacao()));
         } return ResponseEntity.badRequest().build();
     }
 
@@ -45,8 +47,15 @@ public class AuthController {
             novoUsuario.setNome(body.name());
             this.usuarioRepository.save(novoUsuario);
 
+            String codigo = geradorLink.GeradorHash(novoUsuario.getId());
+            novoUsuario.setLinkIndicacao(codigo);
+            usuarioRepository.save(novoUsuario);
+
             String token = this.tokenService.GerarToken(novoUsuario);
-            return ResponseEntity.ok(new ResponseDTO(novoUsuario.getNome(), token));
+
+            String linkIndicacao = "https://site/indicacao/" + codigo;
+
+            return ResponseEntity.ok(new ResponseDTO(novoUsuario.getNome(), token, linkIndicacao));
 
         } return ResponseEntity.badRequest().build();
     }
