@@ -1,0 +1,80 @@
+.container-homepage {
+    width: 450px;
+    background-color: rgba(77, 77, 77, 0.51);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 2px solid rgba(77, 77, 77, 0.5);
+    padding: 40px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.container-homepage p {
+    padding: 5px;
+}
+
+.text-homepage {
+    text-align: center;
+    color: white;
+    font-size: 40px;
+    margin-bottom: 30px;
+}
+
+.perfil-info {
+    margin-top: 20px;
+}
+
+.perfil-info p {
+    font-size: 18px;
+    margin: 15px 0;
+}
+
+.link-indicacao {
+    width: 100%;
+    height: 45px;
+    background-color: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    font-size: 15px;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    outline: none;
+}
+
+.container-homepage button {
+    width: 100%;
+    height: 50px;
+    border: none;
+    outline: none;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: none;
+    margin: 20px 0 10px;
+}
+
+.button-copiar {
+    background-color: #1fb9ff;
+    color: white;
+    transition: 0.3s;
+}
+
+.button-copiar:hover {
+    background-color: #52ccff;
+}
+
+.button-sair {
+    background-color: crimson;
+    color: white;
+    transition: 0.3s;
+}
+
+.button-sair:hover {
+    background-color: rgb(255, 80, 100);
+}
+
+

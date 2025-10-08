@@ -10,6 +10,7 @@ import com.example.Sistema_Indicacao.model.Usuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,31 +34,42 @@ public class AuthController {
         if (passwordEncoder.matches(body.password(), usuario.getSenha())) {
             String token = this.tokenService.GerarToken(usuario);
             return ResponseEntity.ok(new ResponseDTO(usuario.getNome(), token, usuario.getLinkIndicacao()));
-        } return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.badRequest().build();
     }
 
     @PostMapping("/registrar")
+    @Transactional
     public ResponseEntity registrar(@RequestBody RegistrarRequestDTO body) {
+        if (this.usuarioRepository.findByEmail(body.email()).isPresent()) {
+            return ResponseEntity.badRequest().body("Este email já está cadastrado.");
+        }
 
-        Optional<Usuario> usuario = this.usuarioRepository.findByEmail(body.email());
-        if (usuario.isEmpty()) {
-            Usuario novoUsuario = new Usuario();
-            novoUsuario.setSenha(passwordEncoder.encode(body.password()));
-            novoUsuario.setEmail(body.email());
-            novoUsuario.setNome(body.name());
-            this.usuarioRepository.save(novoUsuario);
+        Usuario novoUsuario = new Usuario();
+        novoUsuario.setSenha(passwordEncoder.encode(body.password()));
+        novoUsuario.setEmail(body.email());
+        novoUsuario.setNome(body.name());
 
-            String codigo = geradorLink.GeradorHash(novoUsuario.getId());
-            novoUsuario.setLinkIndicacao(codigo);
-            usuarioRepository.save(novoUsuario);
+        if (body.codigoIndicacao() != null && !body.codigoIndicacao().isEmpty()) {
+            Optional<Usuario> usuarioIndicadorOpt = usuarioRepository.findByLinkIndicacao(body.codigoIndicacao());
 
-            String token = this.tokenService.GerarToken(novoUsuario);
+            if (usuarioIndicadorOpt.isPresent()) {
+                Usuario usuarioIndicador = usuarioIndicadorOpt.get();
+                usuarioIndicador.setPontuacao(usuarioIndicador.getPontuacao() + 1);
+                novoUsuario.setIndicador(usuarioIndicador);
+                usuarioRepository.save(usuarioIndicador);
+            }
+        }
 
-            String linkIndicacao = "https://site/indicacao/" + codigo;
+        this.usuarioRepository.save(novoUsuario);
 
-            return ResponseEntity.ok(new ResponseDTO(novoUsuario.getNome(), token, linkIndicacao));
+        String codigo = geradorLink.GeradorHash(novoUsuario.getId());
+        novoUsuario.setLinkIndicacao(codigo);
+        usuarioRepository.save(novoUsuario);
 
-        } return ResponseEntity.badRequest().build();
+        String token = this.tokenService.GerarToken(novoUsuario);
+        String linkIndicacao = "http://localhost:5173/registrar?ref=" + codigo; // Ajuste se a URL do front for diferente
+
+        return ResponseEntity.ok(new ResponseDTO(novoUsuario.getNome(), token, linkIndicacao));
     }
-
 }
