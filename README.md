@@ -81,6 +81,9 @@ Sistema-de-indicacao/
 
 - **JPA (Java Persistence API)** → Mapeamento objeto-relacional.
   > *motivo de escolha:* Facilita a comunicação entre entidades e o banco.
+ 
+- **Postman** → ferramenta utilizada para testar as rotas HTTP    .
+   >*motivo de escolha:* facilita o desenvolvimento do back-end, permitindo testar e validar cada funcionalidade de forma rápida e prática..
 
 - **Banco de Dados JDBC** → Banco leve e integrado nativamente ao Java.
   > *motivo de escolha:* Evita configurações complexas e tem um painel visual fácil de usar para testes rápidos.
