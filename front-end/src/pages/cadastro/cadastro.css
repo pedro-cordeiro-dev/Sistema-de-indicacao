@@ -77,3 +77,8 @@
     border-bottom: 1px solid red;
     padding-bottom: 10px;
 }
+
+.aviso-indicacao {
+    text-align: center;
+    color: white;
+}
